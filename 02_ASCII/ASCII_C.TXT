@@ -1,0 +1,34 @@
+; 第二次作业（3）：ASCII.C 的反汇编与注释
+; 编译：gcc -m32 -O0 -c ASCII.C -o ASCII.O
+; 反汇编：objdump -dr -Mintel ASCII.O
+
+00000000 <_main>:
+   0:  55                          push   ebp                            ; 保存调用者的帧指针
+   1:  89 e5                       mov    ebp,esp                        ; 建立当前函数的栈帧
+   3:  83 e4 f0                    and    esp,0xfffffff0                 ; 栈指针按 16 字节对齐
+   6:  83 ec 20                    sub    esp,0x20                       ; 分配 32 字节局部变量区
+   9:  e8 00 00 00 00              call   ___main                        ; 调用 C 运行时初始化
+   e:  c7 44 24 1c 61 00 00 00     mov    DWORD PTR [esp+0x1c],0x61      ; ch = 'a'（61h）
+  16:  c7 44 24 18 00 00 00 00     mov    DWORD PTR [esp+0x18],0x0       ; row = 0
+  1e:  83 7c 24 18 01              cmp    DWORD PTR [esp+0x18],0x1       ; row 与 1 比较
+  23:  7f 46                       jg     6b                             ; row > 1 时结束外层循环
+  25:  c7 44 24 14 00 00 00 00     mov    DWORD PTR [esp+0x14],0x0       ; col = 0
+  2d:  83 7c 24 14 0c              cmp    DWORD PTR [esp+0x14],0xc       ; col 与 12 比较
+  32:  7f 18                       jg     4c                             ; col > 12 时结束内层循环
+  34:  8b 44 24 1c                 mov    eax,DWORD PTR [esp+0x1c]       ; eax = ch
+  38:  89 04 24                    mov    DWORD PTR [esp],eax            ; ch 作为 putchar 的参数
+  3b:  e8 00 00 00 00              call   putchar                        ; putchar(ch)
+  40:  83 44 24 1c 01              add    DWORD PTR [esp+0x1c],0x1       ; ch++
+  45:  83 44 24 14 01              add    DWORD PTR [esp+0x14],0x1       ; col++
+  4a:  eb e1                       jmp    2d                             ; 回到内层循环条件
+  4c:  c7 04 24 0d 00 00 00        mov    DWORD PTR [esp],0xd            ; putchar 的参数 = 0Dh（回车）
+  53:  e8 00 00 00 00              call   putchar                        ; putchar('\r')
+  58:  c7 04 24 0a 00 00 00        mov    DWORD PTR [esp],0xa            ; putchar 的参数 = 0Ah（换行）
+  5f:  e8 00 00 00 00              call   putchar                        ; putchar('\n')
+  64:  83 44 24 18 01              add    DWORD PTR [esp+0x18],0x1       ; row++
+  69:  eb b3                       jmp    1e                             ; 回到外层循环条件
+  6b:  b8 00 00 00 00              mov    eax,0x0                        ; 返回值 0
+  70:  c9                          leave                                 ; 恢复调用者的栈帧
+  71:  c3                          ret                                   ; 返回调用者
+  72:  90                          nop                                   ; 对齐填充
+  73:  90                          nop                                   ; 对齐填充
